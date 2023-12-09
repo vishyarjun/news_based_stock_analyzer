@@ -1,0 +1,11 @@
+pandas
+openpyxl
+kiteconnect
+TA-Lib
+ta
+eodhd
+newsapi-python
+python-dotenv
+yfinance
+beautifulsoup4
+google-generativeai
