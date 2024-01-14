@@ -3,6 +3,8 @@ from datetime import datetime, timedelta, date
 from tech_analysis import TA
 import pandas as pd
 import os
+from elastic_interface import elastic
+import requests
 
 class YahooFinanceInterface:
     def __init__(self):
@@ -62,5 +64,23 @@ class YahooFinanceInterface:
             return his.iloc[-1]
         else:
             return None
+    
+    def get_symbol_from_name(self, name, symbol):
+        print(name, symbol)
+        try:
+            yfinance = "https://query2.finance.yahoo.com/v1/finance/search"
+            user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36'
+            params = {"q": name, "quotes_count": 1, "country": "India"}
+            res = requests.get(url=yfinance, params=params, headers={'User-Agent': user_agent})
+            data = res.json()
+            symbol = next((row['symbol'] for row in data['quotes'] if row['exchange'] == 'NSI' or row['exchange'] == 'BSE'),None)
+            symbol = next(row['symbol'] for row in data['quotes']) if not symbol else symbol
+            print('YF bro!') 
+        except:
+            symbol = elastic.perform_search(name) if data else ""
+            print('ES bro!') 
+        symbol = str(symbol) + ('.NS' if symbol and not(symbol.endswith('.NS')) and not(symbol.endswith('.BO')) else '')
+        return symbol
 
 yfi = YahooFinanceInterface()
+#print(yfi.get_symbol_from_name('Indian Bank',''))

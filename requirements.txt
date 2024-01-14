@@ -9,3 +9,4 @@ python-dotenv
 yfinance
 beautifulsoup4
 google-generativeai
+elasticsearch

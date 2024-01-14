@@ -42,8 +42,8 @@ class PalmInterface:
         Your response must be strictly in the JSON format.Consider the following factors while determining the impact: \
         The magnitude of the news, The sentiment of the news,Market conditions at the date of the news, Liquidity \
         of the stock, The sector in which the company operates, The JSON response should include the keys: symbol, \
-        name, and impact. Do not consider indices such as NIFTY. If the news is not related to the stock market or any \
-        specific company, leave the values blank. Do not invent values; maintain accuracy and integrity in your response.\
+        name, and impact. If the news is not related to the Indian stock market or any \
+        specific Indian company, leave the values blank. Do not invent values; maintain accuracy and integrity in your response.\
         
          Examples:
         1. Article: "{article_1}"
@@ -62,7 +62,7 @@ class PalmInterface:
         template3 = f"You excel in succinctly summarizing business and finance-related news articles.\
         Upon receiving a news article, your objective is to craft a concise and accurate summary while \
         retaining the name of the company mentioned in the original article. The essence of the article \
-        should be preserved in your summary. A job well done in summarizing may earn you a generous tip.\
+        should be preserved in your summary. Summarized text should be less than length of original text\
         Please proceed with the provided full news article. {full_news}"
         try:
             defaults = { 'model': 'models/text-bison-001' }
@@ -74,3 +74,7 @@ class PalmInterface:
         
 
 palm_interface=PalmInterface()
+# news_article = """Crude oil exhibited significant volatility as prices surged following Iran's seizure of an oil tanker and the US launching an airstrike on Houthi-controlled areas, according to analysts. On Thursday, Iran seized a tanker carrying Iraqi crude bound for Turkey, retaliating against the US's confiscation of the same vessel and its oil last year, as reported by Iranian state media. 
+# ‘’Anticipating ongoing geopolitical tensions, we project crude oil prices to remain volatile. Crude oil finds support in the range of $73.10–72.40, with resistance expected at $74.65–75.10 for the current session. In terms of Indian Rupees (INR), crude oil is supported at ₹5,940–5,870, while resistance is observed at ₹6,110–6,190,'' said Rahul Kalantri, VP Commodities, Mehta Equities Ltd."""
+
+# print(palm_interface.prompt(news_article))

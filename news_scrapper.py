@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 class LiveMintScrapper:
 
     def extract(self,URL):
+        print(URL)
         #URL = "https://www.livemint.com/market/stock-market-news/chandrayaan-3-moon-landing-paras-defence-share-price-jumps-over-17-to-hit-a-fresh-52-week-high-11692850429978.html"
         page = requests.get(URL)
         soup = BeautifulSoup(page.content, "html.parser")

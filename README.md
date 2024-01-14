@@ -11,6 +11,11 @@ This simple app leverages the ability of News Aggregation Services and combining
 2. cd to the root directory of the application.
 3. Install the dependencies using following command `pip3 install -r requirements.txt`.
 4. Create a .env file on the directory and Make sure to set your API keys on the .env file.
+5. Install Docker and run a container with elasticsearch.
+6. Load the data from EQUITY_L.csv into elasticsearch by uncommenting
+    `Line 62: elastic.load_data()`
+7. save and run `python3 elastic_interface.py`
+8. comment the line 62 again and save.
 
 ```sh
 python3 news_tech_trader.py
