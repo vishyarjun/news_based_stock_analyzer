@@ -24,6 +24,7 @@ class NewsTrader:
     
 
     def generate_recommendation(self, df):
+        df['recommendation'] = 'N/A'
         for index, row in df.iterrows():
             sym = row['symbol']
             if not pd.isna(row['symbol']) and len(row['symbol'])>0:
@@ -34,27 +35,38 @@ class NewsTrader:
                         df['RSI_AT_TIME'] = None
                     df.loc[index,'PRICE_AT_TIME'] = close
                     df.loc[index,'RSI_AT_TIME'] = rsi
-                    if row['impact'] > 0.4:
+                    
+                    if row['impact'] >= 0.4:
                         if rsi <=35:
                             self.strong_buy.append(row['symbol'])
+                            df.loc[index,'recommendation'] = "STRONG BUY"
                         else:
                             self.buy.append(row['symbol'])
+                            df.loc[index,'recommendation'] = "BUY"
                             
-                    elif row['impact'] < -0.4:
+                    elif row['impact'] <= -0.4:
                         if rsi >=75:
                             self.strong_sell.append(row['symbol'])
+                            df.loc[index,'recommendation'] = "STRONG SELL"
                         else:
                             self.sell.append(row['symbol'])
+                            df.loc[index,'recommendation'] = "SELL"
         return df
 
-    def run(self):
+    def run(self, day):
         results_list = []
-        extracted_news_file = f'./data/news/{date.today()}.csv'
-        #extracted_news_file = f'./data/news/2024-01-09.csv'
+        day = date.today() if not day else day
+        print(day)
+        extracted_news_file = f'./data/news/{day}.csv'
+        #extracted_news_file = f'./data/news/2024-01-20.csv'
         df = pd.DataFrame()
         if not os.path.exists(extracted_news_file):
+            print('file doesnt exist')
             extracted_news_file = news.extract_news()
         df = pd.read_csv(extracted_news_file)
+        yield 5,"Download Completed.."
+        df_len = len(df)
+        i = 0
         if 'symbol' not in df:
             for index,row in df.iterrows():
                 text = factory.create_and_scrape(row['URL'])
@@ -62,17 +74,24 @@ class NewsTrader:
                     text = str(row['Title']) + ' ' + str(row['Description'])  
                 text = palm_interface.summarize(text)
                 data = palm_interface.prompt(text)
+                print(data)
                 symbol = yfi.get_symbol_from_name(data['name'],data['symbol']) if data else ""
+                print(symbol)
                 results_list.append({
                 'symbol': symbol if symbol else "",
                 'name': data['name'] if data else "",
                 'impact': data['impact'] if data else 0.0
                 })
+                i+=1
+                percentage = i/df_len*100
+                yield int(percentage), "Scrapping and AI Analyzing in progress..."
             df2 = pd.DataFrame(results_list)
             df = pd.concat([df, df2], axis=1)
-            
-        df = self.generate_recommendation(df)
-        df.to_csv(extracted_news_file, index=False)
+
+        yield 100, "Generating Recommendations"
+        if 'PRICE_AT_TIME' not in df.columns:   
+            df = self.generate_recommendation(df)
+            df.to_csv(extracted_news_file, index=False)
         
         print(f'self.strong_buy - {self.strong_buy}')
         print(f'self.buy - {self.buy}')
@@ -80,7 +99,7 @@ class NewsTrader:
         print(f'self.strong_sell - {self.strong_sell}')
 
 nt = NewsTrader()
-nt.run()
+#nt.run(date.today())
 
 
 

@@ -32,13 +32,13 @@ class NewsApi:
                                             )
                 if top_headlines.get('status')=='ok':
                     for row in top_headlines.get("articles",None):
-                        article = [row['publishedAt'],row['title'],row['description'],row['url']]
+                        article = [row['publishedAt'],row['title'],row['description'],row['url'],row['urlToImage']]
                         all_articles.append(article)
                 page+=1
                 
                 if len(all_articles)>=top_headlines['totalResults']:
                     break
-            self.all_articles = pd.DataFrame(all_articles,columns=['Date','Title','Description','URL'])
+            self.all_articles = pd.DataFrame(all_articles,columns=['Date','Title','Description','URL','ImageURL'])
             self.all_articles.to_csv(f'{self.csv_location}{self.filename}')
             return f'{self.csv_location}{self.filename}'
         except Exception as e:

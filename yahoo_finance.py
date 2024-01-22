@@ -9,7 +9,7 @@ import requests
 class YahooFinanceInterface:
     def __init__(self):
         self.interval = '1d'
-        self.period  = '1y'
+        self.period  = '2y'
         self.file_path = f'./data/historical/analysis/'
         
     
@@ -33,7 +33,7 @@ class YahooFinanceInterface:
 
 
     def download_data(self, symbol, location):
-        if not symbol.endswith('.NS'):
+        if not symbol.endswith('.NS') and not symbol.endswith('.BO'):
             symbol+='.NS'
         full_path = f'{location}/{symbol}.csv'
         
@@ -75,10 +75,10 @@ class YahooFinanceInterface:
             data = res.json()
             symbol = next((row['symbol'] for row in data['quotes'] if row['exchange'] == 'NSI' or row['exchange'] == 'BSE'),None)
             symbol = next(row['symbol'] for row in data['quotes']) if not symbol else symbol
-            print('YF bro!') 
+            
         except:
             symbol = elastic.perform_search(name) if data else ""
-            print('ES bro!') 
+            
         symbol = str(symbol) + ('.NS' if symbol and not(symbol.endswith('.NS')) and not(symbol.endswith('.BO')) else '')
         return symbol
 
