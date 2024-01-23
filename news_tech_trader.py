@@ -22,6 +22,15 @@ class NewsTrader:
         else:
             return row['RSI14'] if row['RSI14'] else 50.0, row['CLOSE']
     
+    def delete_historical_data(self):
+        folder_path = './data/'  # Replace with your folder path
+        # Get a list of all files in the folder
+        files = os.listdir(folder_path)
+        # Iterate through the files and delete if the file is a CSV file
+        for file in files:
+            if file.endswith('.csv'):
+                file_path = os.path.join(folder_path, file)
+                os.remove(file_path)
 
     def generate_recommendation(self, df):
         df['recommendation'] = 'N/A'
@@ -56,12 +65,9 @@ class NewsTrader:
     def run(self, day):
         results_list = []
         day = date.today() if not day else day
-        print(day)
         extracted_news_file = f'./data/news/{day}.csv'
-        #extracted_news_file = f'./data/news/2024-01-20.csv'
         df = pd.DataFrame()
         if not os.path.exists(extracted_news_file):
-            print('file doesnt exist')
             extracted_news_file = news.extract_news()
         df = pd.read_csv(extracted_news_file)
         yield 5,"Download Completed.."
@@ -74,9 +80,7 @@ class NewsTrader:
                     text = str(row['Title']) + ' ' + str(row['Description'])  
                 text = palm_interface.summarize(text)
                 data = palm_interface.prompt(text)
-                print(data)
                 symbol = yfi.get_symbol_from_name(data['name'],data['symbol']) if data else ""
-                print(symbol)
                 results_list.append({
                 'symbol': symbol if symbol else "",
                 'name': data['name'] if data else "",
@@ -92,6 +96,7 @@ class NewsTrader:
         if 'PRICE_AT_TIME' not in df.columns:   
             df = self.generate_recommendation(df)
             df.to_csv(extracted_news_file, index=False)
+        self.delete_historical_data()
         
         print(f'self.strong_buy - {self.strong_buy}')
         print(f'self.buy - {self.buy}')

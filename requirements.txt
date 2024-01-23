@@ -10,3 +10,4 @@ yfinance
 beautifulsoup4
 google-generativeai
 elasticsearch
+streamlit

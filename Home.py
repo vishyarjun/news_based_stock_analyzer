@@ -6,46 +6,47 @@ from news_tech_trader import nt
 import time
 
 st.set_page_config(layout="wide")
-col1, col2, col3 = st.columns(3)
-
-cols = [col1, col2, col3]
-
 bgs = [
-    "#8B0000",  # Dark Red
-    "#B22222",
-    "#DC143C",
-    "#FF4500",  # Orange-Red
-    "#FF6347",
-    "#FF7F50",
-    "#FFA07A",
-    "#FFD700",  # Gold
-    "#ADFF2F",  # Green-Yellow
-    "#008000"   # Dark Green
+    "#8B0000","#B22222","#DC143C","#FF4500", "#FF6347","#FF7F50","#FFA07A","#FFD700", "#ADFF2F","#008000"
 ]
 
 def local_css(file_name):
     with open(file_name) as f:
         st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
 
+def delete_historical_data():
+    folder_path = './data/'  # Replace with your folder path
+    # Get a list of all files in the folder
+    files = os.listdir(folder_path)
+    # Iterate through the files and delete if the file is a CSV file
+    for file in files:
+        if file.endswith('.csv'):
+            file_path = os.path.join(folder_path, file)
+            os.remove(file_path)
+
+def get_data_frame(file_name):
+    df = pd.read_csv(file_name)
+    if 'ImageURL' not in df.columns:
+        df['ImageURL'] = None
+    
+    if 'recommendation' not in df.columns:
+        df['recommendation'] = None
+    
+    if 'PRICE_AT_TIME' not in df.columns:
+        df['PRICE_AT_TIME'] = None
+    else:
+        df = df[df['PRICE_AT_TIME'].notna()]
+    df = df.sort_values(by='impact', ascending = False)
+    return df
 
 local_css('./styles.css')
-def extract_news_from_date(selected_date):
+def display_news_cards(selected_date):
+    col1, col2, col3 = st.columns(3)
+    cols = [col1, col2, col3]   
     file_name = f'./data/news/{selected_date}.csv'
-    file_name
     if os.path.exists(file_name):
-        df = pd.read_csv(file_name)
-        if 'ImageURL' not in df.columns:
-            df['ImageURL'] = None
-        
-        if 'recommendation' not in df.columns:
-            df['recommendation'] = None
-        
-        if 'PRICE_AT_TIME' not in df.columns:
-            df['PRICE_AT_TIME'] = None
-        else:
-            df = df[df['PRICE_AT_TIME'].notna()]
+        df = get_data_frame(file_name)
         chunk_size = 3
-        df = df.sort_values(by='impact', ascending = False)
         for i in range(0, len(df), chunk_size):
             chunk = df.iloc[i:i+chunk_size].reset_index(drop=True)
             for idx, row in chunk.iterrows():
@@ -61,7 +62,8 @@ def extract_news_from_date(selected_date):
                                 <div class="content">
                                     <h2><a href="{row['URL']}" target="_blank">{row['Title']}</a></h2>
                                     <p class="organization">{row['name']} - {row['symbol']}</p>
-                                    <p class="sentiment">AI Sentiment: {row['recommendation']}</p>
+                                    <p class="sentiment">AI Sentiment(ranges from -1 to 1): {row['impact']}</p>
+                                    <p class="sentiment">AI Recommendation: {row['recommendation']}</p>
                                 </div>
                                 <div class="sentiment-container">
                                     <!-- Sentiment Fill -->
@@ -83,13 +85,14 @@ def progress_bar():
     my_bar.empty()
 
 
-
-if st.button(f'Download Latest {date.today()}'):
+but_click = st.button(f'Download Latest {date.today()}')
+if but_click:
     d = None
     progress_bar()
     d = date.today()
-d = st.date_input(label=":blue[Select a date]",value="today",format="YYYY-MM-DD")
+    but_click = False
+
+d = st.date_input(label=":blue[Select a date]",format="YYYY-MM-DD")
 if d:
-    extract_news_from_date(d)
-
-
+    with st.expander("News"):
+        display_news_cards(d)

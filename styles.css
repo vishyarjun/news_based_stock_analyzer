@@ -30,7 +30,7 @@
 
 .card p {
     font-size: 0.9em;
-    color: #555;
+    color: #21bdf5;
 }
 
 .card .organization {
@@ -55,7 +55,7 @@
 
 .card .sentiment-label {
     font-size: 25px;
-    color: #333;
+    color: #44e6f8;
 }
 
 /* Link Styling */

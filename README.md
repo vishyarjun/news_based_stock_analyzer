@@ -20,3 +20,8 @@ This simple app leverages the ability of News Aggregation Services and combining
 ```sh
 python3 news_tech_trader.py
 ```
+9. To run the Streamlit server and work on this app through the UI
+
+```sh
+streamlit run Home.py
+```
